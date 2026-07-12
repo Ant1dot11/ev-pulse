@@ -1,34 +1,33 @@
 import json
-import google.generativeai as genai
-from config import GEMINI_API_KEY
-
-genai.configure(api_key=GEMINI_API_KEY)
-
-model = genai.GenerativeModel("gemini-2.5-flash")
+from gemini_client import generate
 
 
 def choose_best_news(news_list):
     prompt = """
-Ти — головний редактор українського медіа EV Pulse.
+Ти — головний редактор EV Pulse.
 
-Перед тобою список новин.
+Перед тобою список заголовків новин.
 
-Оціни КОЖНУ новину за шкалою від 0 до 100.
+Оціни КОЖНУ новину.
+
+Поверни ЛИШЕ JSON-масив.
+
+Формат:
+
+[
+    {
+        "title": "Назва новини",
+        "score": 98,
+        "reason": "Коротке пояснення"
+    }
+]
 
 Критерії:
 
-• Наскільки новина важлива для власників електромобілів.
-• Наскільки вона цікава українській аудиторії.
-• Наскільки вона актуальна.
-• Наскільки вона впливає на ринок електромобілів.
-
-Не віддавай високі оцінки:
-
-- eVTOL
-- літакам
-- дронам
-- незначним оновленням застосунків
-- малозначущим судовим справам
+• важливість;
+• актуальність;
+• вплив на ринок EV;
+• цікавість українській аудиторії.
 
 Віддавай перевагу:
 
@@ -45,35 +44,23 @@ def choose_best_news(news_list):
 - батареям
 - зарядним станціям
 - новим моделям
-- автономному керуванню
-- програмному забезпеченню автомобілів
+- автономному водінню
 
-Поверни ЛИШЕ JSON-масив.
+Не віддавай високі оцінки:
 
-Приклад:
-
-[
-    {
-        "number": 1,
-        "score": 95,
-        "reason": "Дуже важлива новина."
-    },
-    {
-        "number": 2,
-        "score": 83,
-        "reason": "Цікава, але менш важлива."
-    }
-]
+- eVTOL
+- літакам
+- дронам
+- дрібним оновленням
+- малозначущим судовим справам
 
 Новини:
 """
 
-    for i, item in enumerate(news_list, start=1):
-        prompt += f"\n{i}. {item['title']}"
+    for item in news_list:
+        prompt += f"\n- {item['title']}"
 
-    response = model.generate_content(prompt)
-
-    text = response.text.strip()
+    text = generate(prompt).strip()
 
     if text.startswith("```"):
         text = text.replace("```json", "").replace("```", "").strip()
@@ -86,6 +73,9 @@ def choose_best_news(news_list):
 def get_best_news(news_list):
     results = choose_best_news(news_list)
 
-    results.sort(key=lambda x: x["score"], reverse=True)
+    results.sort(
+        key=lambda x: x["score"],
+        reverse=True
+    )
 
     return results

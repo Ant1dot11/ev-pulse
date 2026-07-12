@@ -1,37 +1,32 @@
 import feedparser
-from sources import RSS_SOURCES
+
+RSS_FEEDS = {
+    "Electrek": "https://electrek.co/feed/",
+    "InsideEVs": "https://insideevs.com/rss/news/",
+    "CleanTechnica": "https://cleantechnica.com/category/cleantech/electric-vehicles/feed/",
+    "Teslarati": "https://www.teslarati.com/feed/",
+    "EVXL": "https://evxl.co/feed/",
+}
 
 
-def get_latest_news(limit=20):
-    news_list = []
+def get_latest_news(limit_per_source=10):
 
-    for rss in RSS_SOURCES:
-        feed = feedparser.parse(rss)
+    news = []
 
-        for news in feed.entries[:10]:
-            news_list.append({
-                "title": news.title,
-                "summary": getattr(news, "summary", ""),
-                "link": news.link,
-                "source": feed.feed.get("title", rss)
-            })
+    for source, url in RSS_FEEDS.items():
 
-    # удаляем дубликаты по ссылке
-    unique_news = []
-    links = set()
+        try:
+            feed = feedparser.parse(url)
 
-    for item in news_list:
-        if item["link"] not in links:
-            unique_news.append(item)
-            links.add(item["link"])
+            for item in feed.entries[:limit_per_source]:
 
-    return unique_news[:limit]
+                news.append({
+                    "title": item.title,
+                    "link": item.link,
+                    "source": source
+                })
 
+        except Exception as e:
+            print(f"{source}: {e}")
 
-if __name__ == "__main__":
-    news = get_latest_news()
-
-    print(f"Знайдено новин: {len(news)}\n")
-
-    for item in news:
-        print(f"[{item['source']}] {item['title']}")
+    return news
