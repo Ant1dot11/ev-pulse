@@ -1,8 +1,7 @@
 from google import genai
 from google.genai.errors import ClientError
 
-from config import GEMINI_KEYS
-from config import GEMINI_KEYS , MODEL
+from config import GEMINI_KEYS, MODEL
 
 
 def generate(prompt):
