@@ -113,14 +113,16 @@ def build_best_post():
             print("✅ Перевірку фактів пропущено (AI Score високий)")
 
     return {
-        "post": post,
-        "title": winner["title"],
-        "link": winner["link"],
-        "source": winner["source"],
-        "image": winner["image"],
-        "score": winner["score"],
-        "reason": winner_ai.get("reason", "")
-    }
+            "post": post,
+            "article": winner["text"],
+            "title": winner["title"],
+            "title": winner["title"],
+            "link": winner["link"],
+            "source": winner["source"],
+            "image": winner["image"],
+            "score": winner["score"],
+            "reason": winner_ai.get("reason", "")
+        }
 
 
 if __name__ == "__main__":

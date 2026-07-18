@@ -7,7 +7,7 @@ from database import (
 # Создаем базу автоматически при запуске
 init_db()
 
-all = [
+__all__ = [
     "is_published",
     "add_published",
 ]

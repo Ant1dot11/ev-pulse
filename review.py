@@ -1,33 +1,27 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Bot
 
 from config import TOKEN, ADMIN_ID
-
-from telegram import Bot
+from database import create_pending_post
 
 bot = Bot(token=TOKEN)
 
 
 async def send_for_review(result):
 
+    pending_id = create_pending_post(
+        link=result["link"],
+        title=result["title"],
+        source=result["source"],
+        score=result["score"],
+        image=result.get("image", ""),
+        article=result.get("article", ""),
+        post=result["post"],
+    )
+
     keyboard = InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(
-                "✅ Опублікувати",
-                callback_data="publish"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "🔄 Перегенерувати",
-                callback_data="regen"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "❌ Відхилити",
-                callback_data="reject"
-            )
-        ]
+        [InlineKeyboardButton("✅ Опублікувати", callback_data=f"review_publish:{pending_id}")],
+        [InlineKeyboardButton("🔄 Перегенерувати", callback_data=f"review_regen:{pending_id}")],
+        [InlineKeyboardButton("❌ Відхилити", callback_data=f"review_reject:{pending_id}")],
     ])
 
     text = result["post"]
@@ -42,10 +36,7 @@ async def send_for_review(result):
         )
 
         if len(text) > 1024:
-            await bot.send_message(
-                ADMIN_ID,
-                text[1024:]
-            )
+            await bot.send_message(ADMIN_ID, text[1024:])
 
     else:
 

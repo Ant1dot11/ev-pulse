@@ -89,12 +89,17 @@ async def send(post, chat_id, image_url=None):
 
                 caption = post[:1024]
 
-                cut = caption.rfind("\n")
+                # Сначала пробуем резать по границе абзаца (двойной перенос) —
+                # так подпись никогда не разорвёт "Джерело:" и сам источник
+                cut = caption.rfind("\n\n")
+
+                if cut == -1:
+                    cut = caption.rfind("\n")
 
                 if cut == -1:
                     cut = caption.rfind(" ")
 
-                if cut > 700:
+                if cut != -1:
                     caption = caption[:cut]
 
                 await bot.send_photo(

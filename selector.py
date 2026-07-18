@@ -1,6 +1,4 @@
-import json
-from gemini_client import generate
-
+from gemini_client import generate_json
 
 def choose_best_article(articles):
     """
@@ -54,11 +52,4 @@ ID:
 {article["text"][:2500]}
 """
 
-    text = generate(prompt).strip()
-
-    if text.startswith("```"):
-        text = text.replace("```json", "").replace("```", "").strip()
-
-    data = json.loads(text)
-
-    return data
+    return generate_json(prompt)

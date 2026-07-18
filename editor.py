@@ -1,6 +1,4 @@
-import json
-from gemini_client import generate
-
+from gemini_client import generate_json
 
 def choose_best_news(news_list):
     prompt = """
@@ -60,14 +58,7 @@ def choose_best_news(news_list):
     for item in news_list:
         prompt += f"\n- {item['title']}"
 
-    text = generate(prompt).strip()
-
-    if text.startswith("```"):
-        text = text.replace("```json", "").replace("```", "").strip()
-
-    data = json.loads(text)
-
-    return data
+    return generate_json(prompt)
 
 
 def get_best_news(news_list):
